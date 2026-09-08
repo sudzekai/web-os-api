@@ -10,13 +10,15 @@ var Args = make(map[string]string)
 var Flags []string = []string{
 	"--dev",
 	"--cfg",
+	"--cli",
+	"--log-level",
 }
 
 func LoadArguments(args []string) {
 	for _, flag := range Flags {
 		idx := slices.Index(args, flag)
 		if idx != -1 {
-			Args[flag] = ""
+			Args[flag] = "val"
 
 			if len(args) >= idx+2 {
 				value := args[idx+1]

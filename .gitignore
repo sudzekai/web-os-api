@@ -31,4 +31,8 @@ go.work.sum
 # .idea/
 # .vscode/
 
+appsettings.json
 appsettings.*.json
+!appsettings.example.json
+/api/cmd/api/linux-arm64/
+build-send-run.bat
