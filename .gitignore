@@ -34,6 +34,9 @@ go.work.sum
 appsettings.json
 appsettings.*.json
 !appsettings.example.json
-/api/cmd/api/linux-arm64/
-/api/cmd/api/api
+
+/api/main/api/linux-arm64/
+/api/main/api/api
+*.so
+
 build-send-run.bat

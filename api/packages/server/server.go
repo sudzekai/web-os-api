@@ -293,7 +293,12 @@ func (srv *Server) writeResult(
 	result MethodResult,
 ) bool {
 	if srv.resultFilter != nil {
-		srv.resultFilter(writer, result)
+		err := srv.resultFilter(writer, request, result)
+
+		if err != nil {
+			return false
+		}
+
 		return true
 	}
 

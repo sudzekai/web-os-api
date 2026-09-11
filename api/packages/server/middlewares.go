@@ -6,6 +6,6 @@ import (
 
 type Middleware func(http.Handler) http.Handler
 
-type ResultFilterMiddleware func(http.ResponseWriter, MethodResult)
+type ResultFilterMiddleware func(http.ResponseWriter, *http.Request, MethodResult) error
 
 type JwtMiddleware func(http.HandlerFunc, []string) http.HandlerFunc
