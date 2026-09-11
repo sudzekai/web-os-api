@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/sudzekai/web-os-api/logging"
-	"github.com/sudzekai/web-os-api/server"
+	logging "github.com/sudzekai/web-os-api/logging/core"
+	"github.com/sudzekai/web-os-api/modules/files-module/internal/controllers"
+	"github.com/sudzekai/web-os-api/server/abstractions"
 )
 
 type FilesModule struct{}
@@ -20,7 +21,7 @@ func (FilesModule) Description() string {
 }
 
 func (FilesModule) Initialize(
-	srv *server.Server,
+	srv abstractions.IServer,
 	conf logging.LoggingConfiguration,
 ) error {
 	logging.Configuration = conf
@@ -28,6 +29,7 @@ func (FilesModule) Initialize(
 	log := logging.NewLogger("files-module:initialization")
 	log.LogInformation("Запущена инициализация модуля...")
 
+	controllers.FilesController.Connect(srv)
 	return nil
 }
 

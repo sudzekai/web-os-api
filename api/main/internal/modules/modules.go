@@ -7,14 +7,14 @@ import (
 	"plugin"
 	"strings"
 
-	"github.com/sudzekai/web-os-api/logging"
+	logging "github.com/sudzekai/web-os-api/logging/core"
 	"github.com/sudzekai/web-os-api/module"
-	"github.com/sudzekai/web-os-api/server"
+	"github.com/sudzekai/web-os-api/server/abstractions"
 )
 
-var modules = make(map[string]string)
+var modules map[string]string
 
-func Load(path string, srv *server.Server, loggingConfiguration logging.LoggingConfiguration) error {
+func Load(path string, srv abstractions.IServer, loggingConfiguration logging.LoggingConfiguration) error {
 	log := logging.NewLogger("modules:loader")
 
 	p, err := plugin.Open(path)
@@ -54,9 +54,10 @@ func Load(path string, srv *server.Server, loggingConfiguration logging.LoggingC
 	return nil
 }
 
-func LoadModules(srv *server.Server, loggingConfiguration logging.LoggingConfiguration) error {
-	log := logging.NewLogger("modules")
+func LoadModules(srv abstractions.IServer, loggingConfiguration logging.LoggingConfiguration) error {
+	modules = make(map[string]string)
 
+	log := logging.NewLogger("modules")
 	log.LogInformation("Начата загрузка модулей...")
 
 	files, err := os.ReadDir("./modules")

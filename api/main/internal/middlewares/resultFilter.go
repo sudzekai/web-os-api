@@ -6,10 +6,10 @@ import (
 	"net/http"
 
 	"github.com/sudzekai/web-os-api/internal/objects/responses"
-	"github.com/sudzekai/web-os-api/server"
+	"github.com/sudzekai/web-os-api/server/types"
 )
 
-func ResultFilter(w http.ResponseWriter, r *http.Request, result server.MethodResult) error {
+func ResultFilter(w http.ResponseWriter, r *http.Request, result types.MethodResult) error {
 	response := responses.ResponseEnvelope{}
 
 	response.IsSuccess = result.Error == nil

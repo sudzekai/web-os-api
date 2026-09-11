@@ -35,8 +35,8 @@ appsettings.json
 appsettings.*.json
 !appsettings.example.json
 
-/api/main/api/linux-arm64/
-/api/main/api/api
-*.so
-
+api/main/api/linux-arm64/
+api/main/api/api
+api/modules/module-builder
+*.desktop
 build-send-run.bat

@@ -9,3 +9,7 @@ replace github.com/sudzekai/web-os-api/logging => ../../packages/logging
 require github.com/sudzekai/web-os-api/server v0.0.0 // direct
 
 replace github.com/sudzekai/web-os-api/server => ../../packages/server
+
+require github.com/sudzekai/web-os-api/executor v0.0.0 // direct
+
+replace github.com/sudzekai/web-os-api/executor => ../../packages/executor

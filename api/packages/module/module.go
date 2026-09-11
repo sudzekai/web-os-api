@@ -1,13 +1,13 @@
 package module
 
 import (
-	"github.com/sudzekai/web-os-api/logging"
-	"github.com/sudzekai/web-os-api/server"
+	logging "github.com/sudzekai/web-os-api/logging/core"
+	"github.com/sudzekai/web-os-api/server/abstractions"
 )
 
 type Module interface {
 	Name() string
 	Version() string
 	Description() string
-	Initialize(*server.Server, logging.LoggingConfiguration) error
+	Initialize(abstractions.IServer, logging.LoggingConfiguration) error
 }

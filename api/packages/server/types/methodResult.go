@@ -1,4 +1,4 @@
-package server
+package types
 
 type MethodResult struct {
 	Data       any

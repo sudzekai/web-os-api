@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/sudzekai/web-os-api/internal/args"
@@ -12,8 +13,9 @@ import (
 	"github.com/sudzekai/web-os-api/internal/controllers"
 	"github.com/sudzekai/web-os-api/internal/middlewares"
 	"github.com/sudzekai/web-os-api/internal/modules"
-	"github.com/sudzekai/web-os-api/logging"
-	"github.com/sudzekai/web-os-api/server"
+	logging "github.com/sudzekai/web-os-api/logging/core"
+	types "github.com/sudzekai/web-os-api/logging/types"
+	server "github.com/sudzekai/web-os-api/server/core"
 )
 
 func main() {
@@ -40,17 +42,21 @@ func createServer() *server.Server {
 
 	log := logging.NewLogger("server")
 
-	srv.AddLoggingProvider(log)
+	srv.SetLoggingProvider(log)
 
 	return srv
 }
 
 func configureServer(srv *server.Server) {
-	modules.LoadModules(srv, logging.Configuration)
+	loadModules(srv)
 
 	srv.SetResultFilter(middlewares.ResultFilter)
 
 	controllers.HealthController.Connect(srv)
+}
+
+func loadModules(srv *server.Server) {
+	modules.LoadModules(srv, logging.Configuration)
 }
 
 func configureEnvironment() {
@@ -59,7 +65,7 @@ func configureEnvironment() {
 }
 
 func configureArgs() {
-	logging.Configuration.SetMinLevel(logging.Information)
+	logging.Configuration.SetMinLevel(types.Information)
 	logging.Configuration.SetWriter(os.Stdout)
 
 	log := logging.NewLogger("main:configuration:args")
@@ -145,6 +151,10 @@ func logConfiguration(log *logging.Logger, cfg *config.Config) {
 		"Конфигурация:\n%s",
 		string(data),
 	)
+
+	executable, _ := os.Executable()
+
+	log.LogDebug("Рабочая директория: %s", filepath.Dir(executable))
 }
 
 func readInput(srv *server.Server) {
@@ -207,6 +217,17 @@ func createCommands(
 
 		"stat": func() {
 			logStats(srv, log)
+		},
+
+		"modules reload": func() {
+			if srv.IsListening() {
+				log.LogError("Невозможно перезагрузить модули, сервер уже запущен")
+			} else {
+				loadModules(srv)
+			}
+		},
+		"modules list": func() {
+			modules.LogLoadedModules()
 		},
 	}
 }

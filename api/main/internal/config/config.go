@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 var CFG = Config{}
@@ -37,7 +38,15 @@ type Database struct {
 }
 
 func LoadConfig(fileName string) error {
-	_, err := os.Stat(fileName)
+	executable, err := os.Executable()
+
+	if err != nil {
+		return fmt.Errorf("Ошибка чтения файла конфигурации: %s", err.Error())
+	}
+
+	fileName = filepath.Join(filepath.Dir(executable), fileName)
+
+	_, err = os.Stat(fileName)
 
 	if err != nil {
 		return fmt.Errorf("Ошибка чтения файла конфигурации: Файл %s не существует", fileName)
