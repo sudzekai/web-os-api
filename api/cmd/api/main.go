@@ -7,18 +7,19 @@ import (
 	"os"
 	"strings"
 
-	pkgLogging "github.com/sudzekai/golang-logging"
 	"github.com/sudzekai/web-os-api/internal/args"
 	"github.com/sudzekai/web-os-api/internal/config"
-	"github.com/sudzekai/web-os-api/internal/controllers"
-	"github.com/sudzekai/web-os-api/internal/server"
-	"github.com/sudzekai/web-os-api/internal/utilities/logging"
+	"github.com/sudzekai/web-os-api/internal/modules"
+	"github.com/sudzekai/web-os-api/logging"
+	"github.com/sudzekai/web-os-api/server"
 )
 
 func main() {
 	configureEnvironment()
 
 	srv := createServer()
+
+	modules.LoadModules(srv, logging.Configuration)
 
 	go srv.Start()
 
@@ -36,8 +37,9 @@ func createServer() *server.Server {
 		config.CFG.WebHost.Port,
 	)
 
-	srv.AddHandler("GET /test", controllers.TestHandler)
-	srv.AddHandler("GET /test/{id}", controllers.TestHandler)
+	log := logging.NewLogger("server")
+
+	srv.AddLoggingProvider(log)
 
 	return srv
 }
@@ -48,7 +50,10 @@ func configureEnvironment() {
 }
 
 func configureArgs() {
-	log := logging.LoggerFactory.NewLogger("main:configuration:args")
+	logging.Configuration.SetMinLevel(logging.Information)
+	logging.Configuration.SetWriter(os.Stdout)
+
+	log := logging.NewLogger("main:configuration:args")
 
 	args.LoadArguments(os.Args)
 
@@ -87,21 +92,21 @@ func applyArgumentOverrides() {
 func applyConfiguration() {
 	cfg := config.CFG
 
-	if err := logging.SetMinLevel(cfg.Logging.LogLevel); err != nil {
+	if err := logging.Configuration.SetMinLevelStr(cfg.Logging.LogLevel); err != nil {
 		panic(err)
 	}
 
 	if cfg.Console.IsCliEnabled {
-		logging.LoggerFactory.EnableCliSymbol()
+		logging.Configuration.EnableCliSymbol()
 	}
 
-	log := logging.LoggerFactory.NewLogger("main:configuration:apply")
+	log := logging.NewLogger("main:configuration:apply")
 
 	logArguments(log)
 	logConfiguration(log, &cfg)
 }
 
-func logArguments(log pkgLogging.Logger) {
+func logArguments(log *logging.Logger) {
 	if len(args.Args) == 0 {
 		return
 	}
@@ -121,7 +126,7 @@ func logArguments(log pkgLogging.Logger) {
 	)
 }
 
-func logConfiguration(log pkgLogging.Logger, cfg *config.Config) {
+func logConfiguration(log *logging.Logger, cfg *config.Config) {
 	cfg.Database.Password = "*****"
 	cfg.Database.User = "*****"
 
@@ -135,7 +140,7 @@ func logConfiguration(log pkgLogging.Logger, cfg *config.Config) {
 
 func readInput(srv *server.Server) {
 	reader := bufio.NewReader(os.Stdin)
-	log := logging.LoggerFactory.NewLogger("main:cli")
+	log := logging.NewLogger("main:cli")
 
 	commands := createCommands(srv, log)
 
@@ -163,13 +168,23 @@ func readInput(srv *server.Server) {
 
 func createCommands(
 	srv *server.Server,
-	log pkgLogging.Logger,
+	log *logging.Logger,
 ) map[string]func() {
 	return map[string]func(){
-		"stop": srv.Stop,
+		"stop": func() {
+			if srv.IsListening() {
+				srv.Stop()
+			} else {
+				log.LogError("Сервер не запущен")
+			}
+		},
 
 		"start": func() {
-			go srv.Start()
+			if !srv.IsListening() {
+				go srv.Start()
+			} else {
+				log.LogError("Сервер уже запущен")
+			}
 		},
 
 		"restart": func() {
@@ -187,19 +202,19 @@ func createCommands(
 	}
 }
 
-func logEndpoints(srv *server.Server, log pkgLogging.Logger) {
+func logEndpoints(srv *server.Server, log *logging.Logger) {
 	log.LogInformation(
 		"Эндпоинты:\n\t%s",
 		strings.Join(srv.GetEndpoints(), "\n\t"),
 	)
 }
 
-func logStats(srv *server.Server, log pkgLogging.Logger) {
+func logStats(srv *server.Server, log *logging.Logger) {
 	stat := srv.GetStats()
 
 	log.LogInformation(
 		"Статистика:\n%-17s %v\n%-17s %d\n%-17s %d\n%-17s %d\n%-17s %s\n%-17s %s",
-		"Запущен:", srv.IsListening,
+		"Запущен:", srv.IsListening(),
 		"Запросы:", stat.Requests.Load(),
 		"Ответы:", stat.Responses.Load(),
 		"Ошибки:", stat.Errors.Load(),

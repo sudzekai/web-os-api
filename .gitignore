@@ -35,4 +35,5 @@ appsettings.json
 appsettings.*.json
 !appsettings.example.json
 /api/cmd/api/linux-arm64/
+/api/cmd/api/api
 build-send-run.bat
