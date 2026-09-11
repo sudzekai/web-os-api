@@ -9,6 +9,8 @@ import (
 
 	"github.com/sudzekai/web-os-api/internal/args"
 	"github.com/sudzekai/web-os-api/internal/config"
+	"github.com/sudzekai/web-os-api/internal/controllers"
+	"github.com/sudzekai/web-os-api/internal/middlewares"
 	"github.com/sudzekai/web-os-api/internal/modules"
 	"github.com/sudzekai/web-os-api/logging"
 	"github.com/sudzekai/web-os-api/server"
@@ -18,8 +20,7 @@ func main() {
 	configureEnvironment()
 
 	srv := createServer()
-
-	modules.LoadModules(srv, logging.Configuration)
+	configureServer(srv)
 
 	go srv.Start()
 
@@ -42,6 +43,14 @@ func createServer() *server.Server {
 	srv.AddLoggingProvider(log)
 
 	return srv
+}
+
+func configureServer(srv *server.Server) {
+	modules.LoadModules(srv, logging.Configuration)
+
+	srv.SetResultFilter(middlewares.ResultFilter)
+
+	controllers.HealthController.Connect(srv)
 }
 
 func configureEnvironment() {
