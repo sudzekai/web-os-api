@@ -22,12 +22,12 @@ var (
 	GroupID    = StatKeyPattern{"GroupID", "%g"}
 	LinkTarget = StatKeyPattern{"LinkTarget", "%N"}
 
-	Permissions = StatKeyPattern{"Permissions", "%A"}
+	Permissions = StatKeyPattern{"Permissions", "%a"}
 
-	SpecialPermissions = StatKeyPattern{"SpecialPermissions", "%A"}
-	UserPermissions    = StatKeyPattern{"UserPermissions", "%A"}
-	GroupPermissions   = StatKeyPattern{"GroupPermissions", "%A"}
-	OthersPermissions  = StatKeyPattern{"OthersPermissions", "%A"}
+	SpecialPermissions = StatKeyPattern{"SpecialPermissions", "%a"}
+	UserPermissions    = StatKeyPattern{"UserPermissions", "%a"}
+	GroupPermissions   = StatKeyPattern{"GroupPermissions", "%a"}
+	OthersPermissions  = StatKeyPattern{"OthersPermissions", "%a"}
 
 	BirthDateTime        = StatKeyPattern{"BirthDateTime", "%w"}
 	ModificationDateTime = StatKeyPattern{"ModificationDateTime", "%y"}

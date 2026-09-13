@@ -7,16 +7,31 @@ import (
 	"plugin"
 	"strings"
 
-	logging "github.com/sudzekai/web-os-api/logging/core"
+	executor "github.com/sudzekai/web-os-api/executor/abstractions"
+	logging "github.com/sudzekai/web-os-api/logging/abstractions"
 	"github.com/sudzekai/web-os-api/module"
 	"github.com/sudzekai/web-os-api/server/abstractions"
+	server "github.com/sudzekai/web-os-api/server/abstractions"
 )
+
+type ModulesLoader struct {
+	modules        map[string]string
+	loggingFactory logging.ILoggerFactory
+	logger         logging.ILogger
+	executor       executor.IExecutor
+	server         server.IServer
+}
+
+func NewModulesLoader(loggerFactory logging.ILoggerFactory) *ModulesLoader {
+	return &ModulesLoader{
+		modules: make(map[string]string),
+		logger:  loggerFactory.NewLogger("modules-loader"),
+	}
+}
 
 var modules map[string]string
 
-func Load(path string, srv abstractions.IServer, loggingConfiguration logging.LoggingConfiguration) error {
-	log := logging.NewLogger("modules:loader")
-
+func (loader *ModulesLoader) Load(path string, srv abstractions.IServer) error {
 	p, err := plugin.Open(path)
 	if err != nil {
 		return fmt.Errorf("загрузка модуля %q: %w", path, err)

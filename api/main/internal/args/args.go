@@ -7,7 +7,7 @@ import (
 
 var Args = make(map[string]string)
 
-var Flags []string = []string{
+var flags []string = []string{
 	"--dev",
 	"--cfg",
 	"--cli",
@@ -15,7 +15,7 @@ var Flags []string = []string{
 }
 
 func LoadArguments(args []string) {
-	for _, flag := range Flags {
+	for _, flag := range flags {
 		idx := slices.Index(args, flag)
 		if idx != -1 {
 			Args[flag] = "val"

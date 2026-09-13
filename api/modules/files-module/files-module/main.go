@@ -1,6 +1,7 @@
 package main
 
 import (
+	executorAbstractions "github.com/sudzekai/web-os-api/executor/abstractions"
 	logging "github.com/sudzekai/web-os-api/logging/core"
 	"github.com/sudzekai/web-os-api/modules/files-module/internal/controllers"
 	"github.com/sudzekai/web-os-api/server/abstractions"
@@ -23,6 +24,7 @@ func (FilesModule) Description() string {
 func (FilesModule) Initialize(
 	srv abstractions.IServer,
 	conf logging.LoggingConfiguration,
+	executor executorAbstractions.IExecutor,
 ) error {
 	logging.Configuration = conf
 

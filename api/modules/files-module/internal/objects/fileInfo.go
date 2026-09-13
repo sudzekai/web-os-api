@@ -110,6 +110,10 @@ func (fi *FileInfo) getFullName() string {
 func (fi *FileInfo) getType() types.FileType {
 	typeStr := fi.stats["Type"]
 
+	if typeStr == "" {
+		return types.Unknown
+	}
+
 	switch typeStr {
 	case "regular file":
 		return types.Regular
@@ -233,13 +237,17 @@ func (fi *FileInfo) getPermissions() string {
 }
 
 func parsePermissions(permissionsStr string) map[string][]types.FilePermission {
+	result := make(map[string][]types.FilePermission)
+
+	if permissionsStr == "" {
+		return result
+	}
+
 	chars := []rune(permissionsStr)
 
 	if len(chars) < 4 {
 		chars = append([]rune{'0'}, chars...)
 	}
-
-	result := make(map[string][]types.FilePermission)
 
 	for i := 0; i < 4; i++ {
 		perms := make([]types.FilePermission, 0, 3)

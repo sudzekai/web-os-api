@@ -1,4 +1,4 @@
-package executor
+package types
 
 type CommandResult struct {
 	Stdout string
